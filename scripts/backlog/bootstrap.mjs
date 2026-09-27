@@ -824,7 +824,7 @@ function addToProject(urlByKey) {
     );
     console.log(`  + ${project.url}`);
   }
-  for (const [key, url] of urlByKey) {
+  for (const url of urlByKey.values()) {
     if (!url) continue;
     ghWrite([
       "project",
