@@ -34,14 +34,18 @@ function gh(args, { input } = {}) {
 
 function ghWrite(args, opts) {
   if (DRY) {
-    console.log(`  [dry-run] gh ${args.map((a) => (a.includes(" ") ? JSON.stringify(a) : a)).join(" ")}`);
+    console.log(
+      `  [dry-run] gh ${args.map((a) => (a.includes(" ") ? JSON.stringify(a) : a)).join(" ")}`,
+    );
     return "";
   }
   return gh(args, opts);
 }
 
 const REPO =
-  repoFlag >= 0 ? argv[repoFlag + 1] : gh(["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"]);
+  repoFlag >= 0
+    ? argv[repoFlag + 1]
+    : gh(["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"]);
 const OWNER = REPO.split("/")[0];
 
 // ---------------------------------------------------------------------------
@@ -77,11 +81,26 @@ const LABELS = [
 // Milestones
 // ---------------------------------------------------------------------------
 const MILESTONES = {
-  M0: ["M0 · Foundation", "Monorepo, tooling, CI, ADRs and the Claude Code workflow."],
-  M1: ["M1 · Data layer", "Last.fm client, RecapData contract, aggregation and the /api/recap endpoint."],
-  M2: ["M2 · Card templates", "Template contract, first layouts, preview, PNG export and customization."],
-  M3: ["M3 · Production (Track A)", "Cloudflare Workers deploy, cache, rate limiting, CD and observability."],
-  M4: ["M4 · Platform (Track B)", "OCI + k3s + Terraform + Argo CD. Epics, split before starting."],
+  M0: [
+    "M0 · Foundation",
+    "Monorepo, tooling, CI, ADRs and the Claude Code workflow.",
+  ],
+  M1: [
+    "M1 · Data layer",
+    "Last.fm client, RecapData contract, aggregation and the /api/recap endpoint.",
+  ],
+  M2: [
+    "M2 · Card templates",
+    "Template contract, first layouts, preview, PNG export and customization.",
+  ],
+  M3: [
+    "M3 · Production (Track A)",
+    "Cloudflare Workers deploy, cache, rate limiting, CD and observability.",
+  ],
+  M4: [
+    "M4 · Platform (Track B)",
+    "OCI + k3s + Terraform + Argo CD. Epics, split before starting.",
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -646,14 +665,31 @@ function main() {
   // Labels (--force makes this idempotent)
   console.log("Labels");
   for (const [name, color, description] of LABELS) {
-    ghWrite(["label", "create", name, "--color", color, "--description", description, "--force", "--repo", REPO]);
+    ghWrite([
+      "label",
+      "create",
+      name,
+      "--color",
+      color,
+      "--description",
+      description,
+      "--force",
+      "--repo",
+      REPO,
+    ]);
   }
   console.log(`  ${LABELS.length} labels ensured\n`);
 
   // Milestones
   console.log("Milestones");
   const existingMs = new Set(
-    gh(["api", `repos/${REPO}/milestones?state=all&per_page=100`, "--paginate", "-q", ".[].title"])
+    gh([
+      "api",
+      `repos/${REPO}/milestones?state=all&per_page=100`,
+      "--paginate",
+      "-q",
+      ".[].title",
+    ])
       .split("\n")
       .filter(Boolean),
   );
@@ -662,15 +698,32 @@ function main() {
       console.log(`  = ${title}`);
       continue;
     }
-    ghWrite(["api", `repos/${REPO}/milestones`, "-f", `title=${title}`, "-f", `description=${description}`]);
+    ghWrite([
+      "api",
+      `repos/${REPO}/milestones`,
+      "-f",
+      `title=${title}`,
+      "-f",
+      `description=${description}`,
+    ]);
     console.log(`  + ${title}`);
   }
   console.log("");
 
   // Existing issues, matched by marker first and title second
   const existing = JSON.parse(
-    gh(["issue", "list", "--repo", REPO, "--state", "all", "--limit", "1000", "--json", "number,title,body,url"]) ||
-      "[]",
+    gh([
+      "issue",
+      "list",
+      "--repo",
+      REPO,
+      "--state",
+      "all",
+      "--limit",
+      "1000",
+      "--json",
+      "number,title,body,url",
+    ]) || "[]",
   );
   const numberByKey = new Map();
   const urlByKey = new Map();
@@ -692,46 +745,100 @@ function main() {
       continue;
     }
     const deps = (item.deps || []).map((k) => {
-      if (!numberByKey.has(k)) throw new Error(`${item.key} depends on ${k}, which is defined later or missing`);
+      if (!numberByKey.has(k))
+        throw new Error(
+          `${item.key} depends on ${k}, which is defined later or missing`,
+        );
       return `- #${numberByKey.get(k)}`;
     });
-    const body = [item.body, deps.length ? `\n## Depends on\n${deps.join("\n")}` : "", `\n${keyMarker(item.key)}`]
+    const body = [
+      item.body,
+      deps.length ? `\n## Depends on\n${deps.join("\n")}` : "",
+      `\n${keyMarker(item.key)}`,
+    ]
       .filter(Boolean)
       .join("\n");
 
-    const args = ["issue", "create", "--repo", REPO, "--title", item.title, "--body-file", "-"];
+    const args = [
+      "issue",
+      "create",
+      "--repo",
+      REPO,
+      "--title",
+      item.title,
+      "--body-file",
+      "-",
+    ];
     for (const l of item.labels) args.push("--label", l);
     args.push("--milestone", MILESTONES[item.ms][0]);
 
     const url = ghWrite(args, { input: body });
-    const number = DRY ? `?${item.key}` : Number(url.match(/\/issues\/(\d+)/)?.[1]);
+    const number = DRY
+      ? `?${item.key}`
+      : Number(url.match(/\/issues\/(\d+)/)?.[1]);
     numberByKey.set(item.key, number);
     urlByKey.set(item.key, url);
     created++;
     console.log(`  + #${number} ${item.title}`);
   }
-  console.log(`\n${created} ${DRY ? "would be created" : "created"}, ${ISSUES.length - created} already present`);
+  console.log(
+    `\n${created} ${DRY ? "would be created" : "created"}, ${ISSUES.length - created} already present`,
+  );
 
   if (WITH_PROJECT) addToProject(urlByKey);
 }
 
 function addToProject(urlByKey) {
   console.log("\nProject board");
-  const list = JSON.parse(gh(["project", "list", "--owner", OWNER, "--format", "json", "--limit", "100"]));
+  const list = JSON.parse(
+    gh([
+      "project",
+      "list",
+      "--owner",
+      OWNER,
+      "--format",
+      "json",
+      "--limit",
+      "100",
+    ]),
+  );
   let project = list.projects.find((p) => p.title === PROJECT_TITLE);
   if (!project) {
     if (DRY) {
-      console.log(`  [dry-run] would create project "${PROJECT_TITLE}" and add ${ISSUES.length} issues`);
+      console.log(
+        `  [dry-run] would create project "${PROJECT_TITLE}" and add ${ISSUES.length} issues`,
+      );
       return;
     }
-    project = JSON.parse(gh(["project", "create", "--owner", OWNER, "--title", PROJECT_TITLE, "--format", "json"]));
+    project = JSON.parse(
+      gh([
+        "project",
+        "create",
+        "--owner",
+        OWNER,
+        "--title",
+        PROJECT_TITLE,
+        "--format",
+        "json",
+      ]),
+    );
     console.log(`  + ${project.url}`);
   }
   for (const [key, url] of urlByKey) {
     if (!url) continue;
-    ghWrite(["project", "item-add", String(project.number), "--owner", OWNER, "--url", url]);
+    ghWrite([
+      "project",
+      "item-add",
+      String(project.number),
+      "--owner",
+      OWNER,
+      "--url",
+      url,
+    ]);
   }
-  console.log(`  items ensured in "${PROJECT_TITLE}". Link it to the repo in the project settings.`);
+  console.log(
+    `  items ensured in "${PROJECT_TITLE}". Link it to the repo in the project settings.`,
+  );
 }
 
 main();
