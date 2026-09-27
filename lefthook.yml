@@ -1,0 +1,22 @@
+# Hooks are installed by lefthook's postinstall script on `pnpm install`.
+# Docs: https://lefthook.dev/configuration/
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    - name: typecheck
+      glob: "*.{ts,tsx,mts,cts}"
+      run: pnpm exec turbo run typecheck --output-logs=errors-only
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
+
+pre-push:
+  jobs:
+    - name: turbo
+      run: pnpm exec turbo run lint typecheck test build --output-logs=errors-only
