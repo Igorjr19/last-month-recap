@@ -4,3 +4,5 @@ packages:
 
 saveExact: true
 engineStrict: true
+allowBuilds:
+  lefthook: true
