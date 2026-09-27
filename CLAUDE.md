@@ -72,30 +72,31 @@ Do not bypass them with `--no-verify`. Fix the failure instead.
 ## Architecture invariants
 
 Decided. Do not reopen them. If you find a strong reason against one, stop and
-ask. Details are in the ADRs (written in #4).
+ask. Details are in the ADRs, indexed in `docs/adr/README.md`.
 
 1. Monorepo with pnpm workspaces and Turborepo. The API keeps runtime-specific
    code in thin adapters (`src/runtime/workers.ts`, later `src/runtime/node.ts`).
-   See ADR-0001.
+   See [ADR-0001](docs/adr/0001-monorepo-and-portable-hono-api.md).
 2. Track A renders the PNG in the browser. Workers Free allows 10 ms of CPU per
    request, too little for server rendering. The API returns aggregated JSON
-   and proxies images so the canvas is not tainted. See ADR-0002.
+   and proxies images so the canvas is not tainted. See [ADR-0002](docs/adr/0002-client-side-png-rendering.md).
 3. Templates are portable. They use only the JSX and CSS subset Satori
    supports: flexbox, inline styles, TTF fonts, absolute image URLs. A test
-   renders every template through Satori. See ADR-0002.
+   renders every template through Satori. See [ADR-0002](docs/adr/0002-client-side-png-rendering.md).
 4. Templates are pluggable. A `TemplateDefinition` declares id, version,
    formats, required data features, an options Zod schema, defaults and a
    component. A registry exposes `listTemplates()`, `getTemplate(id, version?)`
    and `requiredFeatures(id)`. New layouts ship without touching `apps/api`.
-   See ADR-0003.
+   See [ADR-0003](docs/adr/0003-pluggable-card-templates.md).
 5. Customization state lives in the URL (`?t=classic@1&f=story&o=<base64url>`)
    and is validated against the template's options schema. Old template
-   versions stay registered so shared links keep working. See ADR-0003.
+   versions stay registered so shared links keep working. See [ADR-0003](docs/adr/0003-pluggable-card-templates.md).
 6. Cache by month immutability. A closed month is cached with no TTL, the
-   current month for 1 hour. Cache keys include the schema version.
-   See ADR-0004.
+   current month for 1 hour. A month counts as closed a few days after it
+   ends, to allow late scrobbles. Cache keys include the schema version.
+   See [ADR-0004](docs/adr/0004-cache-by-month-immutability.md).
 7. Free-tier limits are design inputs: 100k requests per day per account,
-   10 ms CPU, 50 subrequests per request.
+   10 ms CPU, 50 subrequests per request, 1,000 KV writes per day.
 8. The Last.fm API key lives only on the server.
 9. Two deploy tracks. Track A: Cloudflare Workers, static assets and KV.
    Track B: OCI Always Free ARM VM with k3s, Terraform, Helm, Argo CD, GHCR and
