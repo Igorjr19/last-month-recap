@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Secrets. Never commit these.
+.dev.vars
+.env*
+
+# Editors and OS
+.DS_Store
+.idea/
+*.log
