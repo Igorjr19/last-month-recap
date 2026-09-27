@@ -69,6 +69,9 @@ Installed by lefthook on `pnpm install` (`lefthook.yml`):
 
 Do not bypass them with `--no-verify`. Fix the failure instead.
 
+CI runs the same full check on every PR and push to `main`. See
+[docs/ci.md](docs/ci.md). The required check is the `ci` job.
+
 ## Architecture invariants
 
 Decided. Do not reopen them. If you find a strong reason against one, stop and
