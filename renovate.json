@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":dependencyDashboard",
+    "helpers:pinGitHubActionDigests",
+    "schedule:earlyMondays"
+  ],
+  "timezone": "America/Sao_Paulo",
+  "rangeStrategy": "pin",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "repo",
+  "labels": ["type:chore", "area:repo"],
+  "packageRules": [
+    {
+      "description": "Commitlint requires a scope from the area:* labels, so use chore(repo) for every update, including production dependencies.",
+      "matchPackageNames": ["*"],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "repo"
+    },
+    {
+      "description": "Group minor and patch updates into one weekly PR. Majors stay separate.",
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "groupName": "non-major dependencies",
+      "groupSlug": "non-major"
+    },
+    {
+      "description": "Automerge devDependency patches once the required ci check passes.",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "devDependency patches",
+      "groupSlug": "dev-patch",
+      "automerge": true
+    },
+    {
+      "description": "GitHub Actions updates get their own PR and a ci(ci) commit.",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "groupSlug": "github-actions",
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "ci",
+      "labels": ["type:ci", "area:ci"]
+    }
+  ]
+}

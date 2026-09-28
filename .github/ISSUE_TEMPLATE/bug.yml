@@ -1,0 +1,61 @@
+name: Bug
+description: Something does not work as documented or expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not paste API keys, `.dev.vars` or other secrets. Redact them from
+        logs and URLs.
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What is wrong and where you saw it.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1. 
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include error messages or logs.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Deployment (local, preview, production), browser, commit or URL.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - 
+    validations:
+      required: false
+  - type: textarea
+    id: depends-on
+    attributes:
+      label: Depends on
+      description: One `- #<n>` line per blocking issue. Leave empty if none.
+      placeholder: "- #7"
+    validations:
+      required: false

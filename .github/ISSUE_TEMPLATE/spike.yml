@@ -1,0 +1,37 @@
+name: Spike
+description: A time-boxed question to answer before building something.
+labels: ["type:spike"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The one question this spike answers.
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Experiments or checks to run.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What the spike produces, for example an ADR.
+      value: |
+        - 
+    validations:
+      required: true
+  - type: textarea
+    id: depends-on
+    attributes:
+      label: Depends on
+      description: One `- #<n>` line per blocking issue. Leave empty if none.
+      placeholder: "- #8"
+    validations:
+      required: false

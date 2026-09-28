@@ -37,6 +37,29 @@ new PRs start warm once `main` has a run.
 - `actions/checkout` does not persist credentials.
 - No step uses event data such as PR titles or branch names in shell commands.
 
+## Dependency updates
+
+Renovate reads [`renovate.json`](../renovate.json). It runs early on Monday
+mornings (America/Sao_Paulo) and opens:
+
+- one PR with all minor and patch updates,
+- one PR per major update,
+- one PR for GitHub Actions, with a `ci(ci)` title.
+
+DevDependency patches get their own PR and merge automatically once `ci`
+passes. Everything else waits for the owner. PR titles use `chore(repo)` or
+`ci(ci)`, so the squash commit passes commitlint. Versions stay pinned
+exactly and Actions stay pinned by digest.
+
+The Dependency Dashboard issue lists pending, rate-limited and major updates.
+Renovate runs as the Renovate GitHub App, installed on this repository.
+
+Check the config locally. The validator needs Node 24:
+
+```sh
+mise exec node@24 -- npx --yes --package renovate renovate-config-validator --strict
+```
+
 ## Concurrency
 
 A new push to a PR cancels the run still in progress for that PR. Pushes to
