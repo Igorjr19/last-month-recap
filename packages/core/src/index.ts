@@ -1,2 +1,21 @@
-// Placeholder until the first feature issue for this package lands.
-export const packageName = "@recap/core";
+export {
+  type DataFeature,
+  dataFeatureSchema,
+  RECAP_SCHEMA_VERSION,
+  type RecapActivity,
+  type RecapData,
+  type RecapPeriod,
+  type RecapTotals,
+  type RecapUser,
+  recapActivitySchema,
+  recapDataSchema,
+  recapPeriodSchema,
+  recapTotalsSchema,
+  recapUserSchema,
+  type TopAlbum,
+  type TopArtist,
+  type TopTrack,
+  topAlbumSchema,
+  topArtistSchema,
+  topTrackSchema,
+} from "./recap-data.js";
