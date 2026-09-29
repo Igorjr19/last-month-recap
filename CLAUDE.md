@@ -47,8 +47,10 @@ pnpm fix                            # biome check --write (format, imports, safe
 ```
 
 How tests run: each package gets a `test` script (Vitest) and Turborepo runs
-them after building dependencies. Vitest is not installed yet; the first
-package tests arrive with #7. Until then `pnpm turbo test` has no tasks.
+them after building dependencies. Vitest and Vite are dev dependencies of each
+package that has tests. Tests live in `<package>/test/`, outside `src/`, so
+they are not built to `dist/`. A `test/tsconfig.json` lets the `typecheck`
+script cover them. Packages without tests have no `test` script yet.
 
 Planned commands, not available yet:
 
